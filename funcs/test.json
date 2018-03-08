@@ -1,0 +1,76 @@
+{
+"itmcat": { $ne: "Bundle" }, 
+"workflow.wfsts":
+{ $in: [ "PENDING APPROVAL PDT", "PENDING APPROVAL BUC", "PENDING APPROVAL DISTI OPS", "PENDING PRICE INFO", "PM REWORK" ] } , 
+{ $and: [ { workflow.wfsts: { $in: [ "PM REWORK", "PENDING PRICE INFO" ] } }, { owner: { $in: [ { pidonr: "PSUBBEGO", active: true } ] } } ] }
+}
+
+{
+    "itmcat": { $ne: "Bundle" }, 
+    "workflow.wfsts":
+    { $in: [ "PENDING APPROVAL PDT", "PENDING APPROVAL BUC", "PENDING APPROVAL DISTI OPS", "PENDING PRICE INFO", "PM REWORK" ] },
+    { $and: [ 
+        { "workflow.wfsts": { $in : [ "PM REWORK", "PENDING PRICE INFO" ] } }, 
+        { owner: { $in: [ { pidonr: "PSUBBEGO", active: true } ] } } 
+        ] 
+    }
+}
+
+
+{ $and: [ 
+    { workflow.wfsts: { $in: [ "PM REWORK", "PENDING PRICE INFO" ] } }, 
+    { owner: { $in: [ { pidonr: "PSUBBEGO", active: true } ] } } 
+    ] 
+}
+
+db.coll.find( { "itmcat": { $ne: "Bundle" }, "workflow.wfsts": { $in: [ "PENDING APPROVAL PDT", "PENDING APPROVAL BUC", "PENDING APPROVAL DISTI OPS", "PENDING PRICE INFO", "PM REWORK" ] }, $and: [ { "workflow.wfsts": { $in : [ "PM REWORK", "PENDING PRICE INFO" ] } },          { owner: { $in: [ { pidonr: "PSUBBEGO", active: true } ] } }]}).sort({"crtdt": -1}).limit(100).explain()
+
+db.getSiblingDB("ith").product.aggregate([ { $match: { itmcat: { $ne: "Bundle" }, workflow.wfsts: { $in: [ "PENDING APPROVAL PDT", "PENDING APPROVAL BUC", "PENDING APPROVAL DISTI OPS", "PENDING PRICE INFO", "PM REWORK" ] } } }, { $match: { $and: [ { workflow.wfsts: { $in: [ "PM REWORK", "PENDING PRICE INFO" ] } }, { owner: { $in: [ { pidonr: "PSUBBEGO", active: true } ] } } ] } }, { $sort: { crtdt: -1 } }, { $skip: 0 }, { $limit: 100 } ])
+
+[
+{
+        "$match": { "itmcat": { "$ne": "Bundle"},
+        "workflow.wfsts": {
+          "$in": [ "PENDING APPROVAL PDT", "PENDING APPROVAL BUC","PENDING APPROVAL DISTI OPS","PENDING PRICE INFO","PM REWORK"]
+        }
+    }
+},
+    {
+      "$match": {
+        "$and": [
+          {
+            "workflow.wfsts": {
+              "$in": [
+                "PM REWORK",
+                "PENDING PRICE INFO"
+              ]
+            }
+          },
+          {
+            "owner": {
+              "$in": [
+                {
+                  "pidonr": "PSUBBEGO",
+                  "active": true
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "$sort": {
+        "crtdt": -1
+      }
+    },
+    {
+      "$skip": 0
+    },
+    {
+      "$limit": 100
+    }
+  ]
+
+  db.coll.aggregate([ { "$match": { "itmcat": { "$ne": "Bundle" }, "workflow.wfsts": { "$in": [ "PENDING APPROVAL PDT", "PENDING APPROVAL BUC", "PENDING APPROVAL DISTI OPS", "PENDING PRICE INFO", "PM REWORK" ] } } }, { "$match": { "$and": [ { "workflow.wfsts": { "$in": [ "PM REWORK", "PENDING PRICE INFO" ] } }, { "owner": { "$in": [ { "pidonr": "PSUBBEGO", "active": true } ] } } ] } }, { "$sort": { "crtdt": -1 } }, { "$skip": 0 }, { "$limit": 100 } ],{ hint: { "workflow.wfsts" : 1 } })
+  
